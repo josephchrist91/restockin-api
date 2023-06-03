@@ -38,7 +38,7 @@ $conn = db_connect($host, $username, $password, $db_name);
 
 // check outlet pin ========
 $sql = "
-	select outlet_pin from outlet where outlet_id = '".$req_outletid."'  and outlet_pin = '".$req_outletpin."'
+	select outlet_pin from outlet where outlet_id = '" . $req_outletid . "'  and outlet_pin = '" . $req_outletpin . "'
 	";
 $result = $conn->query($sql);
 $hasilcek = $result->fetch_assoc();
@@ -46,17 +46,41 @@ $hasilcek = $result->fetch_assoc();
 $cekpin = ($hasilcek['outlet_pin'] ? 1 : 0);
 //===============
 
+if ($cekpin == 1) {
+	//insert order ============
 
-//insert order ============
-$cur_datetime = date('Y-m-d H:i:s'); 
+	//insert group
+	$cur_datetime = date('Y-m-d H:i:s');
 
-$sql = "
-INSERT INTO order_group (created_date, created_by) 
-VALUES ('".$cur_datetime."', '".$req_outletid."')";
+	$sql = "
+INSERT INTO order_group (created_date, created_by, status) 
+VALUES ('" . $cur_datetime . "', '" . $req_outletid . "', '0')";
+
+	$result = $conn->query($sql);
+
+	if ($result) {
+		// Get the auto-incremented ID
+		$insertedId = mysqli_insert_id($conn);
+	} else {
+		// Handle the query error
+		echo "Query failed: " . mysqli_error($conn);
+	}
+
+
+	//insert detail
+	foreach ($req_product as $row) {
+		$product = mysqli_real_escape_string($conn, $row['pricePlanCode']);
+		$qty = mysqli_real_escape_string($conn, $row['qty']);
+
+		$query = "INSERT INTO order_detail (order_id, product_id, quantity) VALUES ('$insertedId','$product', '$qty')";
+		$result = $conn->query($query);
+
 	
-$result = $conn->query($sql);
+	}
 
-//==============
+
+	//==============
+}
 
 $arr_data = array(
 	'test' => $cekpin,
