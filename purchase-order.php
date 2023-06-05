@@ -38,12 +38,14 @@ $conn = db_connect($host, $username, $password, $db_name);
 
 // check outlet pin ========
 $sql = "
-	select outlet_pin from outlet where outlet_id = '" . $req_outletid . "'  and outlet_pin = '" . $req_outletpin . "'
+	select outlet_pin, dist_id from outlet where outlet_id = '" . $req_outletid . "'  and outlet_pin = '" . $req_outletpin . "'
 	";
 $result = $conn->query($sql);
 $hasilcek = $result->fetch_assoc();
 
 $cekpin = ($hasilcek['outlet_pin'] ? 1 : 0);
+$outletsuperior = $hasilcek['dist_id'];
+
 //===============
 
 if ($cekpin == 1) {
@@ -53,8 +55,8 @@ if ($cekpin == 1) {
 	$cur_datetime = date('Y-m-d H:i:s');
 
 	$sql = "
-INSERT INTO order_group (created_date, created_by, status) 
-VALUES ('" . $cur_datetime . "', '" . $req_outletid . "', '0')";
+INSERT INTO order_group (created_date, created_by, status, dist_id) 
+VALUES ('" . $cur_datetime . "', '" . $req_outletid . "', '0', '".$outletsuperior."')";
 
 	$result = $conn->query($sql);
 

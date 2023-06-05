@@ -8,7 +8,7 @@ $data_request = json_decode(file_get_contents('php://input'), true);
 
 //store request payload
 // $req_outletpin = $data_request['outletPin'];
-$req_outletid = $data_request['outletId'];
+$req_distid = $data_request['distId'];
 // $req_product = $data_request['product'];
 
 
@@ -39,7 +39,7 @@ $conn = db_connect($host, $username, $password, $db_name);
 // get pending order ========
 $sql = "
 select * from order_detail where order_id IN	
-(select order_id from order_group where status = '0' and created_by = '" . $req_outletid . "')
+(select order_id from order_group where status = '0' and dist_id = '" . $req_distid . "')
 	";
 $result = $conn->query($sql);
 
